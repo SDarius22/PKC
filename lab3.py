@@ -17,7 +17,7 @@ def miller_rabin(n, k=40):
     if n <= 1 or n % 2 == 0:
         return False
 
-    # 1. Find s and d such that n - 1 = 2^s * t (with t odd)
+    # 1. Find s and t such that n - 1 = 2^s * t (with t odd)
     # We do this by repeatedly dividing n - 1 by 2
     t = n - 1
     s = 0
