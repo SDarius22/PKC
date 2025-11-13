@@ -20,13 +20,13 @@ def miller_rabin(n, k=40):
     if n <= 1 or n % 2 == 0:
         return False
 
-    # 1. Find r and d such that n - 1 = 2^r * d (with d odd)
+    # 1. Find s and d such that n - 1 = 2^s * d (with d odd)
     # We do this by repeatedly dividing n - 1 by 2
     d = n - 1
-    r = 0
+    s = 0
     while d % 2 == 0:
         d //= 2
-        r += 1
+        s += 1
 
     # 2. Perform k rounds of testing
     for _ in range(k):
@@ -47,7 +47,7 @@ def miller_rabin(n, k=40):
         # Repeat r-1 times: x = x^2 mod n
         # We are checking the sequence a^d, a^(2d), a^(4d), ...
         is_composite = True
-        for _ in range(r - 1):
+        for _ in range(s - 1):
             x = pow(x, 2, n)
 
             # If we find n-1, 'a' is not a witness.
