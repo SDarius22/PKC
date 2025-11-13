@@ -3,15 +3,12 @@ import random
 
 def miller_rabin(n, k=40):
     """
-    Tests if a number n is prime using the Miller-Rabin algorithm.
+    Function that tests if a number n is prime using the Miller-Rabin algorithm.
 
-    Args:
-        n: The number to test (an integer).
-        k: The number of rounds to perform (default 40).
-           Higher k = more accuracy.
+    :param n: The number to test (an integer).
+    :param k: The number of rounds to perform (Higher k = more accuracy)
 
-    Returns:
-        True if n is probably prime, False if n is definitely composite.
+    :return: True if n is probably prime, False if n is definitely composite.
     """
 
     # Handle base cases for small numbers
