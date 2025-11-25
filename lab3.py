@@ -3,15 +3,12 @@ import random
 
 def miller_rabin(n, k=40):
     """
-    Tests if a number n is prime using the Miller-Rabin algorithm.
+    Function that tests if a number n is prime using the Miller-Rabin algorithm.
 
-    Args:
-        n: The number to test (an integer).
-        k: The number of rounds to perform (default 40).
-           Higher k = more accuracy.
+    :param n: The number to test (an integer).
+    :param k: The number of rounds to perform (Higher k = more accuracy)
 
-    Returns:
-        True if n is probably prime, False if n is definitely composite.
+    :return: True if n is probably prime, False if n is definitely composite.
     """
 
     # Handle base cases for small numbers
@@ -20,22 +17,22 @@ def miller_rabin(n, k=40):
     if n <= 1 or n % 2 == 0:
         return False
 
-    # 1. Find r and d such that n - 1 = 2^r * d (with d odd)
+    # 1. Find s and t such that n - 1 = 2^s * t (with t odd)
     # We do this by repeatedly dividing n - 1 by 2
-    d = n - 1
-    r = 0
-    while d % 2 == 0:
-        d //= 2
-        r += 1
+    t = n - 1
+    s = 0
+    while t % 2 == 0:
+        t //= 2
+        s += 1
 
     # 2. Perform k rounds of testing
     for _ in range(k):
         # 2a. Pick a random witness 'a' in the range [2, n - 2]
         a = random.randint(2, n - 2)
 
-        # 2b. Compute x = a^d mod n
+        # 2b. Compute x = a^t mod n
         # pow(base, exp, mod) is built-in and very efficient
-        x = pow(a, d, n)
+        x = pow(a, t, n)
 
         # 2c. Check the first condition
         # If x is 1 or n-1, 'a' is not a witness,
@@ -44,10 +41,10 @@ def miller_rabin(n, k=40):
             continue
 
         # 2d. The squaring loop
-        # Repeat r-1 times: x = x^2 mod n
-        # We are checking the sequence a^d, a^(2d), a^(4d), ...
+        # Repeat s-1 times: x = x^2 mod n
+        # We are checking the sequence a^t, a^(2t), a^(4t), ...
         is_composite = True
-        for _ in range(r - 1):
+        for _ in range(s - 1):
             x = pow(x, 2, n)
 
             # If we find n-1, 'a' is not a witness.
