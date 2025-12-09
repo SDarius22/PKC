@@ -57,19 +57,3 @@ def encrypt(public_key: McEliecePublicKey, message: Iterable[int]) -> np.ndarray
     # 4. Ciphertext c = c' + z over GF(2).
     c = _mod2(c_prime + z)
     return c
-
-
-if __name__ == "__main__":
-    # Small manual test (using the toy key generator).
-    from lab5.key_generator import generate_mceliece_keys
-
-    n, k, t = 10, 5, 2
-    pk, sk = generate_mceliece_keys(n, k, t)
-
-    # Example random message of length k.
-    m = np.random.randint(0, 2, size=k, dtype=np.uint8)
-
-    c = encrypt(pk, m)
-    print("Message m:     ", m)
-    print("Ciphertext c:  ", c)
-    print("Ciphertext len:", c.size)
