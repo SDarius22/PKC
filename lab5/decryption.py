@@ -58,9 +58,9 @@ def _hamming_distance(a: np.ndarray, b: np.ndarray) -> int:
     return int(np.sum(a ^ b))
 
 
-def _toy_decode_c_hat(c_hat: np.ndarray, G: np.ndarray) -> np.ndarray:
+def _decode_c_hat(c_hat: np.ndarray, G: np.ndarray) -> np.ndarray:
     """
-    Toy decoder for the secret code:
+    Decoder for the secret code:
     brute-force all possible messages m in {0,1}^k,
     compute mG, and pick the one closest to c_hat.
 
@@ -84,7 +84,7 @@ def _toy_decode_c_hat(c_hat: np.ndarray, G: np.ndarray) -> np.ndarray:
             best_dist = dist
             best_m = bits.reshape(-1)
 
-        # Optional small optimization: exact match
+        # small optimization: exact match
         if best_dist == 0:
             break
 
@@ -93,7 +93,7 @@ def _toy_decode_c_hat(c_hat: np.ndarray, G: np.ndarray) -> np.ndarray:
 
 def decrypt(private_key: McEliecePrivateKey, ciphertext: np.ndarray) -> np.ndarray:
     """
-    Decrypt a ciphertext using the (toy) McEliece private key.
+    Decrypt a ciphertext using the McEliece private key.
 
     Steps:
         1. c_hat = c * P^{-1}
@@ -114,8 +114,8 @@ def decrypt(private_key: McEliecePrivateKey, ciphertext: np.ndarray) -> np.ndarr
     P_inv = _invert_permutation_matrix(P)
     c_hat = _mod2(c @ P_inv).reshape(-1)  # length-n
 
-    # 2. Decode c_hat to m_hat using the secret code (toy brute-force)
-    m_hat = _toy_decode_c_hat(c_hat, G)  # length-k
+    # 2. Decode c_hat to m_hat using the secret code
+    m_hat = _decode_c_hat(c_hat, G)  # length-k
 
     # 3. Compute S^{-1} over GF(2)
     S_inv = _gaussian_elim_inverse_mod2(S)
