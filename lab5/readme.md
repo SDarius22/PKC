@@ -2,27 +2,27 @@
 
 This project implements a McEliece-style public-key cryptosystem in Python using NumPy.
 
-Key generation (mapped to our code)
+Key generation
 - Alice picks a binary \([n, k]\) linear code \(C\) that corrects up to \(t\) errors and keeps its decoding structure secret.
-- In our toy code, `lab5/key_generator.py` builds:
+- In our code, `lab5/key_generator.py` builds:
   - Secret generator `G` as a random full‑rank `k x n` binary matrix (`_generate_code_G`).
   - Random invertible `S` (`k x k`) and permutation `P` (`n x n`).
   - Public generator: `G_hat = S @ G @ P mod 2`.
 - Public key: `(G_hat, t)` as `McEliecePublicKey`. Private key: `(S, P, G, t)` as `McEliecePrivateKey`.
 
-Message encryption (mapped to our code)
+Message encryption
 - Bob encodes a `k`‑bit message.
 - Compute `c' = m @ G_hat mod 2`.
 - Sample a random error vector `z` of length `n` with Hamming weight `t`.
 - Ciphertext: `c = c' + z mod 2`.
 - Implemented in `lab5/encryption.py::encrypt`. For text, `lab5/main.py` encodes characters to bits (`_chars_to_bits`) and calls binary encryption.
 
-Message decryption (mapped to our code)
+Message decryption
 - Compute `P^{-1}` (for permutations, `P^{-1} = P.T`).
 - Unpermute: `c_hat = c @ P^{-1} mod 2`.
 - Decode `c_hat` to the nearest codeword of the secret code to recover `m_hat`.
 - Recover `m = m_hat @ S^{-1} mod 2`.
-- Implemented in `lab5/decryption.py::decrypt` with a toy brute‑force decoder and GF\(2\) Gaussian elimination for `S^{-1}`. For text, `lab5/main.py` maps bits back to characters (`_bits_to_chars`).
+- Implemented in `lab5/decryption.py::decrypt` with a brute‑force decoder and GF\(2\) Gaussian elimination for `S^{-1}`. For text, `lab5/main.py` maps bits back to characters (`_bits_to_chars`).
 
 Alphabet interface
 - `lab5/main.py` provides block‑level APIs:
