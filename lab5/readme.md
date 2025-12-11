@@ -1,7 +1,34 @@
-# Toy McEliece Cryptosystem (27-symbol alphabet)
+# McEliece Cryptosystem (27-symbol alphabet)
 
-This project implements a **toy** McEliece-style public-key cryptosystem in Python using NumPy.  
-It is **only for educational purposes** and must not be used for real security.
+This project implements a McEliece-style public-key cryptosystem in Python using NumPy.
+
+Key generation (mapped to our code)
+- Alice picks a binary \([n, k]\) linear code \(C\) that corrects up to \(t\) errors and keeps its decoding structure secret.
+- In our toy code, `lab5/key_generator.py` builds:
+  - Secret generator `G` as a random full‑rank `k x n` binary matrix (`_generate_code_G`).
+  - Random invertible `S` (`k x k`) and permutation `P` (`n x n`).
+  - Public generator: `G_hat = S @ G @ P mod 2`.
+- Public key: `(G_hat, t)` as `McEliecePublicKey`. Private key: `(S, P, G, t)` as `McEliecePrivateKey`.
+
+Message encryption (mapped to our code)
+- Bob encodes a `k`‑bit message.
+- Compute `c' = m @ G_hat mod 2`.
+- Sample a random error vector `z` of length `n` with Hamming weight `t`.
+- Ciphertext: `c = c' + z mod 2`.
+- Implemented in `lab5/encryption.py::encrypt`. For text, `lab5/main.py` encodes characters to bits (`_chars_to_bits`) and calls binary encryption.
+
+Message decryption (mapped to our code)
+- Compute `P^{-1}` (for permutations, `P^{-1} = P.T`).
+- Unpermute: `c_hat = c @ P^{-1} mod 2`.
+- Decode `c_hat` to the nearest codeword of the secret code to recover `m_hat`.
+- Recover `m = m_hat @ S^{-1} mod 2`.
+- Implemented in `lab5/decryption.py::decrypt` with a toy brute‑force decoder and GF\(2\) Gaussian elimination for `S^{-1}`. For text, `lab5/main.py` maps bits back to characters (`_bits_to_chars`).
+
+Alphabet interface
+- `lab5/main.py` provides block‑level APIs:
+  - Key generation: `generate_alpha27_keys(n, k_chars, t)` where `k = 5 * k_chars`.
+  - Encrypt: `encrypt_block` and `encrypt_message`.
+  - Decrypt: `decrypt_block` and `decrypt_message`.
 
 ---
 
@@ -29,7 +56,7 @@ Plaintexts are split into fixed-size blocks of characters, encoded into bits, en
   Binary McEliece encryption on bit-vectors.
 
 * `lab5/decryption.py`  
-  Binary McEliece decryption using a brute-force toy decoder.
+  Binary McEliece decryption using a brute-force decoder.
 
 * `lab5/main.py`  
   High-level 27-symbol alphabet interface:
@@ -48,7 +75,7 @@ In `lab5/main.py`:
     27 symbols.
 
 * Each character is encoded with `BITS_PER_CHAR = 5` bits  
-  (since \(2^5 = 32 \ge 27\)).
+  (since \(2^5 = 32 >= 27\)).
 
 * Encoding (`_chars_to_bits(text)`):
 
@@ -168,7 +195,7 @@ Return value:
 
      * `c_hat = c @ P_inv mod 2`.
 
-  4. Decode `c_hat` to a codeword of the secret code using `_toy_decode_c_hat`:
+  4. Decode `c_hat` to a codeword of the secret code using `_decode_c_hat`:
 
      * Brute-force all `m` in `{0,1}^k`.
      * Compute `m @ G mod 2` and pick the one with minimum Hamming distance to `c_hat`.
@@ -180,7 +207,7 @@ Return value:
 
 Result: length-`k` binary message vector.
 
-> The toy decoder is exponential in `k` and only suitable for very small parameters.
+> The decoder is exponential in `k` and only suitable for very small parameters.
 
 ### 6.2 High-level block decryption (`lab5/main.py`)
 
@@ -203,25 +230,3 @@ Result: length-`k` binary message vector.
 
 No automatic unpadding is performed; the caller may strip trailing `_` characters if desired.
 
----
-
-## 7. Example
-
-Minimal usage via `lab5/main.py`:
-
-```python
-python
-import numpy as np
-from lab5.main import generate_alpha27_keys, encrypt_message, decrypt_message
-
-plaintext = "hello_world_this_is_a_long_message"
-
-# Parameters: n = ciphertext bits per block, k_chars = chars per block, t = errors per block
-n, k_chars, t = 30, 3, 2
-pk, sk = generate_alpha27_keys(n, k_chars, t)
-
-ciphertext = encrypt_message(pk, plaintext)
-print("Ciphertext shape:", ciphertext.shape)  # (num_blocks, n)
-
-recovered = decrypt_message(sk, ciphertext)
-print("Recovered:", recovered)  # includes any '_' padding at the end

@@ -23,8 +23,6 @@ def _validate_plaintext(plaintext: str) -> None:
 
 
 def _validate_ciphertext(ciphertext: np.ndarray, n: int) -> None:
-    if not isinstance(ciphertext, np.ndarray):
-        raise TypeError("Ciphertext must be a numpy.ndarray")
     if ciphertext.ndim not in (1, 2):
         raise ValueError("Ciphertext must be a 1-D or 2-D numpy array")
     if ciphertext.ndim == 1:
@@ -232,7 +230,6 @@ if __name__ == "__main__":
 
     c = encrypt_message(pk, plaintext)
     print("Plaintext:", repr(plaintext))
-    print("Ciphertext shape:", c.shape)
 
     recovered = decrypt_message(sk, c)
     print("Recovered:", repr(recovered))
